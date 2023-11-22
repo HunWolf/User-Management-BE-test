@@ -1,0 +1,324 @@
+{
+	"info": {
+		"_postman_id": "6b765726-6e10-48d7-a9d1-0724ff842759",
+		"name": "Users",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "29368477"
+	},
+	"item": [
+		{
+			"name": "Create user",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"teszt@gmail.com\",\r\n    \"address\": \"Béládi utca 50\",\r\n    \"password\": \"HelloWorld123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server}}users/",
+					"host": [
+						"{{server}}users"
+					],
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"teszt@gmail.com\",\r\n    \"password\": \"HelloWorld123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server}}users/login",
+					"host": [
+						"{{server}}users"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all users",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{server}}users/",
+					"host": [
+						"{{server}}users"
+					],
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get user profile",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-access-token",
+						"value": "{{x-access-token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{server}}users/profile",
+					"host": [
+						"{{server}}users"
+					],
+					"path": [
+						"profile"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get user address",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-access-token",
+						"value": "{{x-access-token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{server}}users/{{userId}}/address",
+					"host": [
+						"{{server}}users"
+					],
+					"path": [
+						"{{userId}}",
+						"address"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null,
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update user profile",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "x-access-token",
+						"value": "{{x-access-token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{    \r\n    \"email\": \"teszt2@gmail.com\",\r\n    \"password\": \"HelloWorld1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server}}users/{{userId}}",
+					"host": [
+						"{{server}}users"
+					],
+					"path": [
+						"{{userId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update user address",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "x-access-token",
+						"value": "{{x-access-token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"addressId\": \"655dba280b70c15fa788971a\",\r\n    \"address\": \"Apponyi utca 123\" \r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server}}users/{{userId}}/updateaddress",
+					"host": [
+						"{{server}}users"
+					],
+					"path": [
+						"{{userId}}",
+						"updateaddress"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "User new address",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "x-access-token",
+						"value": "{{x-access-token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"address\": \"Apponyi utca 1234\" \r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server}}users/{{userId}}/newaddress",
+					"host": [
+						"{{server}}users"
+					],
+					"path": [
+						"{{userId}}",
+						"newaddress"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete user address",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "x-access-token",
+						"value": "{{x-access-token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"addressId\": \"655dba280b70c15fa788971a\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{server}}users/{{userId}}/deleteaddress",
+					"host": [
+						"{{server}}users"
+					],
+					"path": [
+						"{{userId}}",
+						"deleteaddress"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete user",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "x-access-token",
+						"value": "{{x-access-token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{server}}users/{{userId}}",
+					"host": [
+						"{{server}}users"
+					],
+					"path": [
+						"{{userId}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "server",
+			"value": "http://localhost:3000/api/",
+			"type": "string"
+		},
+		{
+			"key": "userId",
+			"value": "655dba280b70c15fa7889718",
+			"type": "string"
+		},
+		{
+			"key": "x-access-token",
+			"value": "c5b44870a2caaa8a6efdbfb745013c5b48cb2de93d9374e9730c2f2e1f5ad5616e7171c9a3ca850f86316633a86572bf1d0471f6f919ecbc2e9c90f471bd4f11",
+			"type": "string"
+		}
+	]
+}

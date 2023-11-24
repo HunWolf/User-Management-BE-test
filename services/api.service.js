@@ -43,10 +43,10 @@ module.exports = {
 					"$node.services",
 					"$node.actions",
 					// Users service
-					"users.registration", // POST /api/users
+					"users.registration",
 					"users.login",
-					"users.listUsers", // GET /api/users
-					"users.listUserProfile", // GET /api/users
+					"users.listUsers",
+					"users.listUserProfile",
 					"users.listUserAddress",
 					"users.profileUpdate",
 					"users.addressUpdate",
@@ -159,7 +159,7 @@ module.exports = {
 			if (req.$action.auth === false) {
 				return null;
 			}
-			
+
 			let token = req.headers["x-access-token"];
 
 			if (!token) {

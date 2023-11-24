@@ -1,7 +1,6 @@
 "use strict";
 
-const fs = require("fs");
-const DbService	= require("moleculer-db");
+const DbService = require("moleculer-db");
 
 /**
  * @typedef {import('moleculer').ServiceSchema} ServiceSchema Moleculer's Service Schema
@@ -9,7 +8,7 @@ const DbService	= require("moleculer-db");
  * @typedef {import('moleculer-db').MoleculerDB} MoleculerDB  Moleculer's DB Service Schema
  */
 
-module.exports = function(collection) {
+module.exports = function (collection) {
 	const cacheCleanEventName = `cache.clean.${collection}`;
 
 	/** @type {MoleculerDB & ServiceSchema} */

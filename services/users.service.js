@@ -1,13 +1,12 @@
 /* eslint-disable indent */
 "use strict";
 
-const mongoose = require("mongoose");
+
 const DbMixin = require("../mixins/db.mixin");
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
-const crypto = require('crypto');
-const { error } = require("console");
-const { Errors } = require("moleculer");
+const crypto = require("crypto");
+
 
 
 /**
@@ -48,7 +47,8 @@ module.exports = {
 				},
 				password: {
 					type: "string",
-					empty: false
+					empty: false,
+					pattern: /^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[A-Z])(?=.*[a-z]).{8,}$/g,
 				}
 			},
 
@@ -79,7 +79,7 @@ module.exports = {
 				} catch (error) {
 					this.errorHandler(error);
 				}
-			},
+			}
 		},
 
 		login: {
@@ -100,30 +100,28 @@ module.exports = {
 					const user = await this.adapter.findOne({ email });
 
 					if (!user) {
-						throw new Error("EMAIL OR PASSWORD INVALID")
+						throw new Error("EMAIL OR PASSWORD INVALID");
 					}
 
 					const passwordValidation = this.comparePassword(
 						password,
 						user.password
-					)
+					);
 
 					if (!passwordValidation) {
-						throw new Error("EMAIL OR PASSWORD INVALID")
+						throw new Error("EMAIL OR PASSWORD INVALID");
 					}
 
-					await this.adapter.updateById(user._id, {token: this.generateToken()});
-
+					await this.adapter.updateById(user._id, { token: this.generateToken() });
 
 					await user.save();
 
 					return this.formatUser(user);
 
-
 				} catch (error) {
 					this.errorHandler(error);
 				}
-			},
+			}
 		},
 
 		listUsers: {
@@ -132,44 +130,34 @@ module.exports = {
 
 			async handler() {
 				try {
-					
 					const result = await this.adapter.find({});
 
-					const users = result.map((x) => this.formatUser(x))
+					const users = result.map((x) => this.formatUser(x));
 
 					return users;
 
 				} catch (error) {
 					this.errorHandler(error);
 				}
-			},
-
+			}
 		},
 
 		listUserProfile: {
 			rest: "GET /profile",
 
-
 			async handler(ctx) {
 
 				const { user } = ctx.meta;
 
-
 				try {
 					const profile = await this.adapter.findById(user._id);
-
-
-					if (!profile) {
-						throw new Error("ID_NOT_FOUND");
-					}
 
 					return this.formatUser(profile);
 
 				} catch (error) {
 					throw new Error("INVALID_ID");
 				}
-			},
-
+			}
 		},
 
 		listUserAddress: {
@@ -183,21 +171,15 @@ module.exports = {
 
 			async handler(ctx) {
 
-				const { _id } = ctx.params;
+				const { user } = ctx.meta;
 
 				try {
-					const profile = await this.adapter.findById({ _id });
-					if (!profile) {
-						throw new Error("ID_NOT_FOUND");
-					}
-
-					return profile.addresses;
+					return user.addresses;
 
 				} catch (error) {
 					this.errorHandler(error);
 				}
-			},
-
+			}
 		},
 
 		profileUpdate: {
@@ -208,31 +190,39 @@ module.exports = {
 					empty: false
 				},
 				email: "email",
-				password: "string"
+				password: {
+					type: "string",
+					pattern: /^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[A-Z])(?=.*[a-z]).{8,}$/g,
+				}
 			},
 
 			async handler(ctx) {
 
-				const { _id, email, password } = ctx.params;
+				const { _id, email } = ctx.params;
 
 				try {
-					const profile = await this.adapter.findById({ _id });
+					const exists = await this.adapter.findOne({ email });
 
-					if (!profile) {
-						throw new Error("ID_NOT_FOUND");
+					if (exists) {
+						throw new Error("EMAIL_ALREADY_IN_USE");
 					}
 
-					const userData = this.validateUserParams(ctx.params, profile)
+					const profile = await this.adapter.findById({ _id });
+
+					const userData = this.validateUserParams(ctx.params, profile);
 
 					const user = await this.adapter.updateById(_id, userData);
 
+					await user.save();
+
 					return this.formatUser(user);
 
-				} catch (error) {
-					throw new Error("INVALID_ID");
-				}
-			},
+					// éles környezetben itt egy elfelejtett jelszó email kellene
 
+				} catch (error) {
+					this.errorHandler(error);
+				}
+			}
 		},
 
 		deleteUser: {
@@ -248,13 +238,12 @@ module.exports = {
 				const { _id } = ctx.params;
 
 				try {
-					const profile = await this.adapter.removeById({ _id });
-					return ('Success')
+					await this.adapter.removeById({ _id });
+					return ("Success");
 
 				} catch (error) {
-					throw new Error("INVALID_ID");
+					this.errorHandler(error);
 				}
-
 			}
 		},
 
@@ -276,10 +265,6 @@ module.exports = {
 				try {
 					const profile = await this.adapter.findById({ _id });
 
-					if (!profile) {
-						throw new Error("ID_NOT_FOUND");
-					}
-
 					if (profile.addresses.findIndex(item => item.address === address) !== -1) {
 						throw new Error("ADDRESS_ALREADY_EXISTS");
 					}
@@ -293,9 +278,7 @@ module.exports = {
 				} catch (error) {
 					this.errorHandler(error);
 				}
-			},
-
-
+			}
 		},
 
 		addressUpdate: {
@@ -317,30 +300,25 @@ module.exports = {
 
 			async handler(ctx) {
 
-				const { _id, addressId, address } = ctx.params;
+				const { addressId, address } = ctx.params;
 
 				try {
-					const profile = await this.adapter.findById({_id});
-
-					if (!profile) {
-						throw new Error("ID_NOT_FOUND");
-					}
-					
 					const user = await User.findOneAndUpdate(
 						{ "addresses._id": addressId },
 						{
-						  $set: { "addresses.$.address": address }
-						},  { returnDocument: 'after' }
-						
-					  );
+							$set: { "addresses.$.address": address }
+						}, { returnDocument: "after" }
+
+					);
+
+					await user.save();
 
 					return this.formatUser(user);
 
 				} catch (error) {
 					throw new Error("ADDRESS_ID_NOT_FOUND");
 				}
-			},
-
+			}
 		},
 
 		deleteAddress: {
@@ -357,35 +335,24 @@ module.exports = {
 			},
 
 			async handler(ctx) {
-				const { _id, addressId } = ctx.params;
-
-				const profile = await this.adapter.findById({ _id });
-					if (!profile) {
-						throw new Error("ID_NOT_FOUND");
-					}
+				const { addressId } = ctx.params;
 
 				try {
-
 					const user = await User.findOneAndUpdate(
 						{ "addresses._id": addressId },
 						{
-						  $pull: { addresses: {_id: addressId} }
-						},  { returnDocument: 'after' }
-						
-					  );
+							$pull: { addresses: { _id: addressId } }
+						}, { returnDocument: "after" }
 
+					);
 
 					return this.formatUser(user);
 
-
 				} catch (error) {
-					throw new Error("ADDRESS_ID_INVALID")
+					throw new Error("ADDRESS_ID_INVALID");
 				}
-
 			}
 		},
-
-
 
 		findByAuthToken: {
 			params: {
@@ -398,15 +365,13 @@ module.exports = {
 				const { token } = ctx.params;
 				try {
 					const user = await this.adapter.findOne({ "token": token });
-
-
 					return user;
+
 				} catch (error) {
 					this.errorHandler(error);
 				}
-			},
+			}
 		},
-
 	},
 
 	/**
@@ -417,16 +382,16 @@ module.exports = {
 		errorHandler(error) {
 			console.log("\n>>>>>>>>> [ERROR]");
 			console.log(error);
-			throw error
+			throw error;
 		},
 
 		formatUser(userData) {
 			const user = {
 				email: userData?.email,
 				addresses: userData.addresses,
-			}
+			};
 
-			return user
+			return user;
 		},
 
 
@@ -441,17 +406,17 @@ module.exports = {
 		validateUserParams(params, user) {
 			const validate = Object.keys(params).filter(key => params[key] !== user[key]);
 			return {
-				email: validate.includes('email') ? params.email : undefined,
-				password: validate.includes('password') ? this.comparePassword(
+				email: validate.includes("email") ? params.email : undefined,
+				password: validate.includes("password") ? this.comparePassword(
 					params.password,
 					user.password
 				) ? undefined : this.hashPassword(params.password) : undefined
 
-			}
+			};
 		},
 
 		generateToken() {
-			return crypto.randomBytes(64).toString('hex')
+			return crypto.randomBytes(64).toString("hex");
 		},
 	},
 
